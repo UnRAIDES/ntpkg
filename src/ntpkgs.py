@@ -22,6 +22,7 @@ class NTPKGS:
         self.args = self.parse_args()
         self.download_path = self.args.download_path
         self.packages = self.args.packages
+        self.url = self.args.url
 
     def parse_args(self):
         parser = argparse.ArgumentParser(description="MKV Tools - Delete Spam.")
@@ -33,6 +34,7 @@ class NTPKGS:
     
         parser.add_argument('--download-path', help='download path', default="/download")
         parser.add_argument('--packages', help='download path', default="/packages")
+        parser.add_argument('--url', help='url source example: https://mirrors.slackware.com/slackware/slackware64-current/CHECKSUMS.md5', default="https://mirrors.slackware.com/slackware/slackware64-current/CHECKSUMS.md5")
                 
         return parser.parse_args()
 
@@ -41,6 +43,7 @@ class NTPKGS:
         url = "https://mirrors.slackware.com/slackware/slackware64/source/ap/"
         url = "https://slackware.uk/slackware/slackware64-15.0/slackware64/ap/"
         url = "https://mirrors.slackware.com/slackware/slackware64-current/CHECKSUMS.md5"
+        url = self.url
 
         payload={}
         headers = {}
