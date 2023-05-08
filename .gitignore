@@ -1,4 +1,6 @@
-*.txt
 *.md5
 *.bak
 download/*
+leeme.txt
+PACKAGES.FILTERED.txt
+README.txt
