@@ -99,9 +99,8 @@ class NTPKGS:
 
 
 def main():
-    """Creates an instance of ZSpotify"""
-    zs = NTPKGS()
-    zs.main()
+    nt = NTPKGS()
+    nt.main()
 
 
 if __name__ == "__main__":
