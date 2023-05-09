@@ -1,0 +1,6 @@
+[DOWNLOAD]
+downloadpath = download
+
+[PACKAGES]
+packagespath = unRAID-NerdTools/packages/pkgs
+
