@@ -7,12 +7,14 @@ import requests
 import re
 import wget
 import shutil
+import configparser
+
 from bs4 import BeautifulSoup
 from pkg_resources import parse_version
 from pathlib import Path
 
 
-__version__ = "VERSION 0.0.2"
+__version__ = "VERSION 0.0.3"
 
 
 
@@ -20,22 +22,25 @@ class NTPKGS:
 
     def __init__(self):
         self.args = self.parse_args()
-        self.download_path = self.args.download_path
-        self.packages = self.args.packages
+        self.config = self.config()
         self.url = self.args.url
+
+        self.download_path = self.args.download_path if self.args.download_path else self.config.get('DOWNLOAD', 'downloadpath')
+        self.packages = self.args.packages      if self.args.packages else self.config.get('PACKAGES', 'packagespath')
 
         os.makedirs(self.download_path, exist_ok=True)
 
     def parse_args(self):
-        parser = argparse.ArgumentParser(description="MKV Tools - Delete Spam.")
+        parser = argparse.ArgumentParser(description="ntpkgs update")
 
         parser.add_argument('-v','--version', action='version', version="%(prog)s " + __version__)
         
         parser.add_argument('-d', '--download', action='store_true', help='download files')
         parser.add_argument('-u', '--update', action='store_true', help='update files')
     
-        parser.add_argument('--download-path', help='download path', default="/download")
-        parser.add_argument('--packages', help='origin package path', default="/packages")
+        parser.add_argument('--download-path', help='download path')
+        parser.add_argument('--packages', help='origin package path')
+
         parser.add_argument('--url', help='url source example: https://mirrors.slackware.com/slackware/slackware64-current/CHECKSUMS.md5', default="https://mirrors.slackware.com/slackware/slackware64-current/CHECKSUMS.md5")
                 
         return parser.parse_args()
@@ -65,6 +70,7 @@ class NTPKGS:
                 split = line.split("./")[1]
                 source_packages.append(split)
         res = []
+        if not os.path.exists(self.packages):return
 
         for path in os.listdir(self.packages):
             if os.path.isfile(os.path.join(self.packages, path)):
@@ -82,8 +88,8 @@ class NTPKGS:
                                     new_url = f"{base_url}/{pack}"
                                     filename = self.updatePackage(new_url)
                                     if self.args.update:
-                                        os.makedirs(os.path.join("/","backup"), exist_ok=True)
-                                        shutil.move(os.path.join(self.packages,path), os.path.join("/","backup",path))
+                                        os.makedirs(os.path.join("/","tmp"), exist_ok=True)
+                                        shutil.move(os.path.join(self.packages,path), os.path.join("/","tmp",path))
                                         shutil.move(filename, self.packages)
                             #else:
                             #    print(f" [*] [{update}] [{package}] -->   [{path}] [{version}]  >>> [{pack}] [{version2}]")
@@ -98,11 +104,11 @@ class NTPKGS:
 
             url = "https://slackbuilds.org/slackbuilds/15.0/SLACKBUILDS.TXT"
             response = self.getResponse(url)
-            print(f" [!] slackbuilds.org \n")
+            print(f"\n [!] slackbuilds.org \n")
 
 
             packages = self.listdir()
-
+            if not packages: return
 
             for line in response.iter_lines(decode_unicode=True):
                 if "NAME:" in line:
@@ -110,7 +116,7 @@ class NTPKGS:
                     NAME = line.split(":")[1].strip()
                 if "LOCATION:" in line:
                     LOCATION = line
-                    LOCATION = line.split(":")[1].strip()
+                    LOCATION = line.split(":")[1].strip().replace("./", "/")
                     source_packages.append(NAME)
                     base_url = os.path.dirname(url)
                     new_url = f"{base_url}{LOCATION}"
@@ -121,8 +127,10 @@ class NTPKGS:
                     for path in packages:
                         _package_origin = re.match('^(.+?)-\d.*', path)[1]
                         _version_origin = re.match('^(.+?)-(\d.+?)(:?-|_).*', path)[2]
+                        
+                        _NAME = re.escape(NAME)
 
-                        if re.match(f'^{NAME}$', _package_origin):
+                        if re.match(f'^{_NAME}$', _package_origin):
                             update = parse_version(_version_origin) < parse_version(VERSION) if not "_" in VERSION else True
                             if update:
                                 print(f" UPDATE  [*] [{update}] [{_package_origin}] -->   [{_package_origin}] [{_version_origin}] >> [{NAME}] [{VERSION}]  [{new_url}]")
@@ -133,6 +141,9 @@ class NTPKGS:
     
 
     def listdir(self):
+
+        if not os.path.exists(self.packages): return False
+
         packages = []
         for path in os.listdir(self.packages):
             packages.append(path)
@@ -162,6 +173,33 @@ class NTPKGS:
         except Exception as e:
             print(f" [!] updatePackage [{e}]")
             return False
+
+    def config(self):
+        ruta_config = os.path.abspath(os.path.join(os.path.dirname(__file__), 'config.ini'))
+
+        config = configparser.ConfigParser()
+        config.read(ruta_config)
+
+        # Si la sección 'NUEVA_SECCION' no existe, se agrega al archivo
+        if 'DOWNLOAD' not in config:
+            config.add_section('DOWNLOAD')
+        if 'PACKAGES' not in config:
+            config.add_section('PACKAGES')
+            
+        # Agregar un nuevo valor a la sección 'DOWNLOAD' si no existe
+        if 'downloadpath' not in config['DOWNLOAD']:
+            config.set('DOWNLOAD', 'downloadpath', 'download')
+        # Agregar un nuevo valor a la sección 'PACKAGES' si no existe
+        if 'packagespath' not in config['PACKAGES']:
+            config.set('PACKAGES', 'packagespath', 'unRAID-NerdTools/packages/pkgs')
+
+        # Escribir los cambios en el archivo
+        with open(ruta_config, 'w') as f:
+            config.write(f)
+
+        return config
+        print(f" [!] config [{config.DOWNLOAD}]")
+
 
 
 def main():
