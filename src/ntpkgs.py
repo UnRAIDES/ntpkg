@@ -12,7 +12,7 @@ from pkg_resources import parse_version
 from pathlib import Path
 
 
-__version__ = "VERSION 0.0.2"
+__version__ = "VERSION 0.0.3"
 
 
 
@@ -27,7 +27,7 @@ class NTPKGS:
         os.makedirs(self.download_path, exist_ok=True)
 
     def parse_args(self):
-        parser = argparse.ArgumentParser(description="MKV Tools - Delete Spam.")
+        parser = argparse.ArgumentParser(description="ntpkgs update")
 
         parser.add_argument('-v','--version', action='version', version="%(prog)s " + __version__)
         
@@ -82,8 +82,8 @@ class NTPKGS:
                                     new_url = f"{base_url}/{pack}"
                                     filename = self.updatePackage(new_url)
                                     if self.args.update:
-                                        os.makedirs(os.path.join("/","backup"), exist_ok=True)
-                                        shutil.move(os.path.join(self.packages,path), os.path.join("/","backup",path))
+                                        os.makedirs(os.path.join("/","tmp"), exist_ok=True)
+                                        shutil.move(os.path.join(self.packages,path), os.path.join("/","tmp",path))
                                         shutil.move(filename, self.packages)
                             #else:
                             #    print(f" [*] [{update}] [{package}] -->   [{path}] [{version}]  >>> [{pack}] [{version2}]")
