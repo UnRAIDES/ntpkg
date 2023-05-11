@@ -14,7 +14,7 @@ from pkg_resources import parse_version
 from pathlib import Path
 
 
-__version__ = "VERSION 0.0.3"
+__version__ = "VERSION 0.0.4"
 
 
 
@@ -24,9 +24,9 @@ class NTPKGS:
         self.args = self.parse_args()
         self.config = self.config()
         self.url = self.args.url
-
+        self.args.download = True if self.args.update else self.args.download
         self.download_path = self.args.download_path if self.args.download_path else self.config.get('DOWNLOAD', 'downloadpath')
-        self.packages = self.args.packages      if self.args.packages else self.config.get('PACKAGES', 'packagespath')
+        self.packages = self.args.packages if self.args.packages else self.config.get('PACKAGES', 'packagespath')
 
         os.makedirs(self.download_path, exist_ok=True)
 
