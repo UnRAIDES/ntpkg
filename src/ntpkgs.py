@@ -14,7 +14,7 @@ from pkg_resources import parse_version
 from pathlib import Path
 
 
-__version__ = "VERSION 0.0.3"
+__version__ = "VERSION 0.0.4"
 
 
 
