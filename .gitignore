@@ -1,7 +1,7 @@
-*.md5
-*.bak
-download/*
+docker-compose.dev.yml
+slackware64-15.0/
 leeme.txt
-PACKAGES.FILTERED.txt
-README.txt
-src/config.ini
+*.bak
+*~
+config.ini
+slackware64.txt
