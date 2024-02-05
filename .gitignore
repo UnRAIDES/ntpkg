@@ -6,3 +6,4 @@ leeme.txt
 PACKAGES.FILTERED.txt
 README.txt
 src/config.ini
+docker-compose.dev.yml

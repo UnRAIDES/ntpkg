@@ -13,6 +13,6 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 
 VOLUME /source /download /packages
 
-COPY ./src/* /source /
+COPY ./src . 
 
-ENTRYPOINT ["python3","ntpkgs.py"]
+CMD ["python3","checkUpdates.py"]
