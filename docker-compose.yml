@@ -1,0 +1,18 @@
+version: '3'
+
+services:
+
+  nerdtools-checkupgrade:
+    build: ./
+    image: jsavargas/nerdtools-checkupgrade:experimental 
+    container_name: nerdtools-checkupgrade
+    restart: unless-stopped
+    network_mode: host
+    environment:
+      - PUID=99
+      - PGID=100
+      - TELEGRAM_BOT_TOKEN=xxxxxxxxxxxxxxxxxxx
+      - TELEGRAM_CHAT_ID=-xxxxxxxxxxxxxx
+      - SPECIFIC_HOURS=07:00
+      - TZ=America/Santiago
+
